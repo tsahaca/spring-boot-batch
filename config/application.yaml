@@ -1,0 +1,89 @@
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    org.springframework.security: INFO
+    org.springframework.web: INFO
+    com.westerasset.protfolio: DEBUG
+  file.name: application.log
+server:
+  port: 8080
+spring:
+  application:
+    name: Spring Boot Batch
+  kafka:
+    bootstrap-servers:
+      - localhost:9092
+    template.default-topic: my-topic
+
+    #  - myaccopunt.aws.confluent.cloud:9092
+    properties:
+      # Schema Registry Connection parameter
+      schema.registry.url: http://localhost:8081
+      sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="ccloud_key" password="ccloud_secret";  # <2>
+      basic.auth.user.info: username:base64EncodedPassword
+      ssl.endpoint.identification.algorithm: https
+      sasl.mechanism: PLAIN
+      #security.protocol: SASL_SSL
+      security.protocol: PLAINTEXT
+      basic.auth.credentials.source: USER_INFO
+      request.timeout.ms: 20000
+      retry.backoff.ms: 500
+      auto.register.schemas: true
+      specific.avro.reader: true
+
+    producer:
+      ##
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      client-id: my-publisher-client
+      properties:
+        linger.ms: 50
+
+  datasource-batch:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:mem:batchdb
+#    url: jdbc:h2:mem:batchdb;INIT=RUNSCRIPT FROM 'classpath:schema.sql'
+    connectionTestQuery: select 1
+    username: sa
+    password:
+
+  datasource:
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/postgres
+    connectionTestQuery: select 1
+    username: postgres
+    password: root
+
+  jpa:
+    databasePlatform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+
+#  batch:
+ #   initialize-schema: always
+  #  initializer:
+   #   enabled: false
+
+  main:
+    allow-bean-definition-overriding: true
+
+  mail.host: mail.host.com
+  mail.protocol: smtp
+  # mail.port: 587
+  # mail.password:
+  # mail.properties.mail.smtp.auth: false
+  # mail.properties.mail.smtp.starttls.enable: false
+
+
+# Enabling H2 Console
+  h2.console.enabled: true
+  #h2.console.path: /h2
+
+# Enable disable auto launch
+  batch.job.enabled: false
+
+
+application:
+  emailTo: tanmay.x.saha@gmail.com
+  emailFrom: noreply-spring-Batch@gmail.com
+  batchSize: 200
+  chunkSize: 1
